@@ -1,20 +1,16 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React from "react";
+import React, { useState } from "react";
 import { TopBar } from "../components/top-bar/top-bar-feature";
 import { HomeScreen } from "../screens/HomeScreen";
+import BlankScreen from "../screens/BlankScreen";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTheme } from "react-native-paper";
-import BlankScreen from "../screens/BlankScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-/**
- * This is the main navigator with a bottom tab bar.
- * Each tab is a stack navigator with its own set of screens.
- *
- * More info: https://reactnavigation.org/docs/bottom-tab-navigator/
- */
-export function HomeNavigator() {
+function TabNavigator() {
   const theme = useTheme();
   return (
     <Tab.Navigator
@@ -47,5 +43,18 @@ export function HomeNavigator() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Blank" component={BlankScreen} />
     </Tab.Navigator>
+  );
+}
+
+export function HomeNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        header: () => <TopBar />,
+      }}
+    >
+      <Stack.Screen name="Main" component={HomeScreen} />
+      <Stack.Screen name="AccountDetail" component={TabNavigator} />
+    </Stack.Navigator>
   );
 }

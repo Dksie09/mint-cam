@@ -35,9 +35,16 @@ import {
 type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
-  // 🔥 Your screens go here
+  Metadata: {
+    metadata: {
+      name: string;
+      symbol: string;
+      description: string;
+      image: string;
+      attributes: Array<{ trait_type: string; value: number }>;
+    };
+  };
 };
-
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -45,18 +52,18 @@ declare global {
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppStack = () => {
   return (
     <Stack.Navigator initialRouteName={"Home"}>
       <Stack.Screen
-        name="HomeStack"
+        name="Home"
         component={HomeNavigator}
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
-      {/** 🔥 Your screens go here */}
+      <Stack.Screen name="Metadata" component={Screens.MetadataScreen} />
     </Stack.Navigator>
   );
 };
