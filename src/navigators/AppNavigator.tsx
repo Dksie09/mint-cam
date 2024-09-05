@@ -18,6 +18,8 @@ import {
   MD3LightTheme,
   adaptNavigationTheme,
 } from "react-native-paper";
+import { NFTSuccess } from "../screens/NFTSuccess";
+import { NFTFailure } from "../screens/NFTFailure";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -31,7 +33,6 @@ import {
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  *
  */
-
 type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
@@ -43,6 +44,16 @@ type RootStackParamList = {
       image: string;
       attributes: Array<{ trait_type: string; value: number }>;
     };
+  };
+  NFTSuccess: {
+    mintAddress: string;
+    imageUrl: string;
+    name: string;
+    symbol: string;
+    attributes: Array<{ trait_type: string; value: number }>;
+  };
+  NFTFailure: {
+    error: string;
   };
 };
 declare global {
@@ -63,7 +74,8 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
-      <Stack.Screen name="Metadata" component={Screens.MetadataScreen} />
+      <Stack.Screen name="NFTSuccess" component={NFTSuccess} />
+      <Stack.Screen name="NFTFailure" component={NFTFailure} />
     </Stack.Navigator>
   );
 };

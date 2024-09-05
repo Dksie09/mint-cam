@@ -6,21 +6,59 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from "react-native";
-import {
-  Button,
-  Text,
-  Icon,
-  useTheme,
-  Card,
-  Title,
-  Paragraph,
-} from "react-native-paper";
-import { useAuthorization } from "../../utils/useAuthorization";
+import { Button, Text, Icon, useTheme, Card, Title } from "react-native-paper";
+import { useAuthorization, APP_IDENTITY } from "../../utils/useAuthorization";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  LAMPORTS_PER_SOL,
+  Keypair,
+} from "@solana/web3.js";
+import {
+  createMint,
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
+  createInitializeMintInstruction,
+  TOKEN_PROGRAM_ID,
+  MINT_SIZE,
+} from "@solana/spl-token";
+import {
+  transact,
+  Web3MobileWallet,
+} from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+
+type RootStackParamList = {
+  Home: undefined;
+  Settings: undefined;
+  Metadata: {
+    metadata: {
+      name: string;
+      symbol: string;
+      description: string;
+      image: string;
+      attributes: Array<{ trait_type: string; value: number }>;
+    };
+  };
+  NFTSuccess: {
+    mintAddress: string;
+    imageUrl: string;
+    name: string;
+    symbol: string;
+    attributes: Array<{ trait_type: string; value: number }>;
+  };
+  NFTFailure: {
+    error: string;
+  };
+};
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/drpkrxpgt/image/upload";
 const CLOUDINARY_UPLOAD_PRESET = "mintcampreset";
@@ -29,6 +67,7 @@ interface Attribute {
   trait_type: string;
   value: number;
 }
+
 interface Metadata {
   name: string;
   symbol: string;
@@ -39,7 +78,8 @@ interface Metadata {
 }
 
 export function UserAccount() {
-  const { selectedAccount } = useAuthorization();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { selectedAccount, authorizeSession } = useAuthorization();
   const [image, setImage] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [location, setLocation] = useState<{
@@ -47,9 +87,9 @@ export function UserAccount() {
     longitude: number;
   } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [minting, setMinting] = useState(false);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const theme = useTheme();
-  const navigation = useNavigation();
 
   const pickImage = async () => {
     setUploading(true);
@@ -141,6 +181,141 @@ export function UserAccount() {
     setMetadata(newMetadata);
   };
 
+  const createNFT = async () => {
+    if (!selectedAccount || !metadata) {
+      Alert.alert("Error", "Wallet not connected or metadata not available");
+      return;
+    }
+
+    setMinting(true);
+    const connection = new Connection(
+      "https://api.devnet.solana.com",
+      "confirmed"
+    );
+
+    try {
+      const payerPublicKey = selectedAccount.publicKey;
+
+      // Check and log the balance of the account
+      const balance = await connection.getBalance(payerPublicKey);
+      console.log(`Account Public Key: ${payerPublicKey.toBase58()}`);
+      console.log(`Account balance: ${balance / LAMPORTS_PER_SOL} SOL`);
+
+      if (balance < LAMPORTS_PER_SOL) {
+        throw new Error(
+          `Insufficient balance. Current balance: ${
+            balance / LAMPORTS_PER_SOL
+          } SOL. Please add some SOL to your account.`
+        );
+      }
+
+      await transact(async (wallet: Web3MobileWallet) => {
+        // Re-authorize the wallet
+        await authorizeSession(wallet);
+
+        // Create a new keypair for the mint
+        const mintKeypair = Keypair.generate();
+
+        console.log("Creating new mint...");
+
+        // Calculate rent for mint
+        const lamports = await connection.getMinimumBalanceForRentExemption(
+          MINT_SIZE
+        );
+
+        // Create instructions
+        const createAccountInstruction = SystemProgram.createAccount({
+          fromPubkey: payerPublicKey,
+          newAccountPubkey: mintKeypair.publicKey,
+          space: MINT_SIZE,
+          lamports,
+          programId: TOKEN_PROGRAM_ID,
+        });
+
+        const initializeMintInstruction = createInitializeMintInstruction(
+          mintKeypair.publicKey,
+          0,
+          payerPublicKey,
+          payerPublicKey
+        );
+
+        // Get the associated token account address
+        const associatedTokenAddress = await getAssociatedTokenAddress(
+          mintKeypair.publicKey,
+          payerPublicKey
+        );
+
+        // Create the associated token account if it doesn't exist
+        const createAssociatedTokenAccountIx =
+          createAssociatedTokenAccountInstruction(
+            payerPublicKey,
+            associatedTokenAddress,
+            payerPublicKey,
+            mintKeypair.publicKey
+          );
+
+        // Create mint-to instruction
+        const mintToInstruction = createMintToInstruction(
+          mintKeypair.publicKey,
+          associatedTokenAddress,
+          payerPublicKey,
+          1
+        );
+
+        // Combine all instructions into a single transaction
+        const transaction = new Transaction().add(
+          createAccountInstruction,
+          initializeMintInstruction,
+          createAssociatedTokenAccountIx,
+          mintToInstruction
+        );
+
+        // Sign transaction
+        transaction.feePayer = payerPublicKey;
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+
+        const [signedTransaction] = await wallet.signTransactions({
+          transactions: [transaction],
+        });
+        if (signedTransaction instanceof Transaction) {
+          signedTransaction.partialSign(mintKeypair);
+
+          // Send and confirm transaction
+          const signature = await connection.sendRawTransaction(
+            signedTransaction.serialize()
+          );
+          await connection.confirmTransaction(signature);
+
+          console.log(
+            `NFT minted successfully. Token Mint: https://explorer.solana.com/address/${mintKeypair.publicKey.toBase58()}?cluster=devnet`
+          );
+
+          // Navigate to success page
+          navigation.navigate("NFTSuccess", {
+            mintAddress: mintKeypair.publicKey.toBase58(),
+            imageUrl: metadata.image,
+            name: metadata.name,
+            symbol: metadata.symbol,
+            attributes: metadata.attributes,
+          });
+        } else {
+          throw new Error("Failed to sign transaction");
+        }
+      });
+    } catch (error) {
+      console.error("Error creating NFT:", error);
+
+      // Navigate to failure page
+      navigation.navigate("NFTFailure", {
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
+      setMinting(false);
+    }
+  };
+
   useEffect(() => {
     getLocation();
   }, []);
@@ -156,14 +331,6 @@ export function UserAccount() {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollViewContent}
         >
-          {/* {location && (
-            <Text
-              style={[styles.locationText, { color: theme.colors.secondary }]}
-            >
-              Latitude: {location.latitude.toFixed(4)}, Longitude:{" "}
-              {location.longitude.toFixed(4)}
-            </Text>
-          )} */}
           <View style={styles.contentContainer}>
             <Text style={styles.title} variant="displaySmall">
               Mint Cam
@@ -219,11 +386,11 @@ export function UserAccount() {
           <View style={styles.buttonContainer}>
             <Button
               mode="contained"
-              disabled={!selectedAccount}
-              onPress={() => navigation.navigate("Metadata", { metadata })}
+              disabled={!selectedAccount || minting}
+              onPress={createNFT}
               style={styles.mintButton}
             >
-              Proceed to Mint NFT
+              {minting ? "Minting..." : "Mint NFT"}
             </Button>
           </View>
         )}
@@ -244,7 +411,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     padding: 16,
-    paddingBottom: 24, // Add extra padding at the bottom
+    paddingBottom: 24,
   },
   contentContainer: {
     alignItems: "center",
