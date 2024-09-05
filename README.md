@@ -68,7 +68,7 @@ DEMO VIDEO: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?s
 yarn create expo-app --template @solana-mobile/solana-mobile-expo-template
 ```
 
-You can read more about running the app [here](https://docs.solanamobile.com/react-native/expo#running-the-app).
+You can read more about it [here](https://docs.solanamobile.com/react-native/expo#running-the-app).
 
 3. Implement image capture:
 
