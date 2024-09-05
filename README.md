@@ -1,105 +1,99 @@
-# Solana Mobile Expo Template
+# MintCam: Geo-Tagged NFT Minting App
 
-This template is a ready-to-go Android Expo dApp that offers:
+MintCam is an Android application that captures images, mints them as NFTs on the Solana blockchain, and adds geolocation metadata.
 
-- Solana libraries: `web3.js`, Mobile Wallet Adapter, and `spl-token`.
-- Required polyfills like `crypto` and `Buffer` configured.
-- Pre-built React UI and re-usable hooks and code patterns like `useMobileWallet`.
+demo video: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?sid=f1173a1b-f908-450a-ae11-ef3b94afae6b)
 
-**This is only fully functional on Android.**
+## Features
+
+- Image capture using device camera
+- NFT minting on Solana blockchain
+- Automatic geo-tagging of NFTs
+- Solana mobile wallet integration
 
 <table>
   <tr>
     <td align="center">
-      <img src="./screenshots/screenshot1.png" alt="Scaffold dApp Screenshot 1" width=300 />
+      <img src="./screenshots/screenshot-010.jpeg" alt="MintCam Screenshot 1" width=300 />
     </td>
     <td align="center">
-      <img src="./screenshots/screenshot2.png" alt="Scaffold dApp Screenshot 2" width=300 />
+      <img src="./screenshots/screenshot-011.jpeg alt="MintCam Screenshot 2" width=300 />
     </td>
     <td align="center">
-      <img src="./screenshots/screenshot3.png" alt="Scaffold dApp Screenshot 3" width=300 />
+      <img src="./screenshots/screenshot-013.jpeg" alt="MintCam Screenshot 3" width=300 />
+    </td>
+    <td align="center">
+      <img src="./screenshots/screenshot-014.jpeg" alt="MintCam Screenshot 3" width=300 />
     </td>
   </tr>
 </table>
 
 ## Tech Stack
 
-| Library               | Category          | Version | Description                                           |
-| --------------------- | ----------------- | ------- | ----------------------------------------------------- |
-| React Native          | Mobile Framework  | v0.73   | The best cross-platform mobile framework              |
-| Expo                  | SDK               | v50     | Allows (optional) Expo modules                        |
-| React                 | UI Framework      | v18     | The most popular UI framework in the world            |
-| Mobile Wallet Adapter | SDK               | v2.0    | Connect and request signing from mobile wallet apps   |
-| Solana web3.js        | SDK               | v1.78   | General Solana library for transactions and RPCs      |
-| spl-token             | SDK               | v0.41   | Library for building with Solana SPL tokens           |
-| React Native Paper    | Component Library | v18     | Production-ready components following Material Design |
-| React Navigation      | Navigation        | v6      | Performant and consistent navigation framework        |
-| React Query           | State management  | v5.24   | Async query management                                |
-| TypeScript            | Language          | v5      | Static typechecking                                   |
-| AsyncStorage          | Persistence       | v1      | State persistence                                     |
+- React Native with Expo
+- Solana Web3.js
+- @solana-mobile/mobile-wallet-adapter-protocol
+- expo-image-picker
+- expo-location
 
-## Quick Start
+## Setup
 
-### Prerequisites
+1. Initialize the project:
 
-- A free [Expo](https://expo.dev/) account.
-- An Android device/emulator to test your app
-  - Install an MWA compliant wallet app on your device/emulator.
-- If using Expo's cloud service `eas build`, no further setup is required.
-- If building locally:
-  - React Native and Android Envrionment [setup](https://docs.solanamobile.com/getting-started/development-setup)
+   ```
+   git clone https://github.com/Dksie09/mint-cam
+   ```
 
-### Initialize
+2. Install
 
-Run the CLI command:
+   ```
+   yarn
+   ```
+
+3. Set up account on Cloudinary and get `CLOUDINARY_URL` and `CLOUDINARY_UPLOAD_PRESET`
+
+4. Run the app:
+   ```
+   yarn expo run:android --device
+   ```
+
+## Development Steps
+
+1. Set up the Expo project using the Solana Mobile template.
 
 ```
 yarn create expo-app --template @solana-mobile/solana-mobile-expo-template
 ```
 
-Choose your project name then navigate into the directory.
+`For more details refer to: https://docs.solanamobile.com/react-native/expo#running-the-app
 
-### Build and run the app
+3. Implement image capture:
 
-Once your app is initialized, follow the **["Running the app"](https://docs.solanamobile.com/react-native/expo#running-the-app)** guide to launch the template as a custom development build.
+   - Use `expo-image-picker` to access the device camera.
+   - Store the captured image locally.
 
-## Troubleshooting
+4. Implement geolocation:
 
-- `Metro has encountered an error: While trying to resolve module @solana-mobile/mobile-wallet-adapter-protocol...`
+   - Use `expo-location` to get the device's current location.
+   - Store latitude and longitude coordinates.
 
-  - This is an on-going issue when using `npm install` to install the Expo template.
-  - To mitigate, clean your project dependencies and reinstall with `yarn install`
+5. Set up Solana wallet connection:
 
-- `The package 'solana-mobile-wallet-adapter-protocol' doesn't seem to be linked. Make sure: ...`
+   - Integrate @solana-mobile/mobile-wallet-adapter-protocol.
+   - Implement wallet connection functionality.
 
-  - Ensure you are _NOT_ using Expo Go to run your app.
-  - You need to be using an [Expo custom development build](https://docs.solanamobile.com/react-native/expo#custom-development-build), rather than Expo Go.
+6. Implement image upload:
 
-- `failed to connect to...`
+   - Upload captured image to `Cloudinary`.
 
-  - This is an Expo error that can occur when trying to connect to the dev server on certain Wifi networks.
-  - To fix, try starting the dev server with the `--tunnel` command (`npx expo start --dev-client --tunnel`)
+7. Create NFT metadata:
 
-- `Error: crypto.getRandomValues() not supported`
-  - This is a polyfill issue when trying to use certain functions from the `@solana/web3.js` in a React Native/Expo environment.
-  - To fix, ensure your App properly imports and uses the polyfills like in this [guide](http://docs.solanamobile.com/react-native/expo#step-3-update-appjs-with-polyfills).
+   - Prepare metadata including image URL and location data.
 
-<br>
+8. Implement NFT minting:
+   - Use `@solana/web3.js` to connect to the Solana network.
+   - Create and send mint transaction using `@solana/spl-token`.
 
-- `error Failed to load configuration of your project.`
-  - Same as above, but for `yarn`. [Uninstall and reinstall](https://github.com/react-native-community/cli#updating-the-cli) the CLI through yarn.
+## License
 
-<br>
-
-- `Looks like your iOS environment is not properly set`:
-  - You can ignore this during template initialization and build the Android app as normal. This template is only compatible with Android.
-
-<br>
-
-- `Usage Error: It seems you are trying to add a package using a https:... url; we now require package names to be explicitly specified.`
-  - This error happens on certain versions of `yarn`, and occurs if you try to initialize the template through the Github repo URL, rather than the npm package. To avoid this, use the `@solana-mobile/solana-mobile-dapp-scaffold` package as specified, or downgrade your `yarn` version to classic (1.22.x).
-
-<br>
-
-- `error Couldn't find the ".../@solana-mobile/solana-mobile-dapp-scaffold/template.config.js file inside "@solana-mobile/solana-mobile-dapp-scaffold" template.`
-  - This is a [known error](https://github.com/react-native-community/cli/issues/1924) that occurs with certain versions of `yarn` (>= 3.5.0). It is fixed by running the cli command with the `--npm` flag or downgrading your version of `yarn`.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
