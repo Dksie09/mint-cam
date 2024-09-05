@@ -2,7 +2,7 @@
 
 MintCam is an Android application that captures images, mints them as NFTs on the Solana blockchain, and adds geolocation metadata.
 
-demo video: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?sid=f1173a1b-f908-450a-ae11-ef3b94afae6b)
+DEMO VIDEO: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?sid=f1173a1b-f908-450a-ae11-ef3b94afae6b)
 
 ## Features
 
@@ -68,7 +68,7 @@ demo video: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?s
 yarn create expo-app --template @solana-mobile/solana-mobile-expo-template
 ```
 
-`For more details refer to: https://docs.solanamobile.com/react-native/expo#running-the-app
+You can read more about running the app [here](https://docs.solanamobile.com/react-native/expo#running-the-app).
 
 3. Implement image capture:
 
