@@ -13,17 +13,20 @@ demo video: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?s
 
 <table>
   <tr>
+  <td align="center">
+      <img src="./screenshots/screenshot-000.jpeg" alt="MintCam Screenshot 0" width=300 />
+    </td>
     <td align="center">
       <img src="./screenshots/screenshot-010.jpeg" alt="MintCam Screenshot 1" width=300 />
     </td>
     <td align="center">
-      <img src="./screenshots/screenshot-011.jpeg alt="MintCam Screenshot 2" width=300 />
+      <img src="./screenshots/screenshot-011.jpeg" alt="MintCam Screenshot 2" width=300 />
     </td>
     <td align="center">
       <img src="./screenshots/screenshot-013.jpeg" alt="MintCam Screenshot 3" width=300 />
     </td>
     <td align="center">
-      <img src="./screenshots/screenshot-014.jpeg" alt="MintCam Screenshot 3" width=300 />
+      <img src="./screenshots/screenshot-014.jpeg" alt="MintCam Screenshot 4" width=300 />
     </td>
   </tr>
 </table>
