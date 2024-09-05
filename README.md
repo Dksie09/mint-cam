@@ -1,4 +1,4 @@
-# MintCam: Geo-Tagged NFT Minting App
+# MintCam
 
 MintCam is an Android application that captures images, mints them as NFTs on the Solana blockchain, and adds geolocation metadata.
 
