@@ -62,38 +62,36 @@ DEMO VIDEO: [link](https://www.loom.com/share/7f087ddf80ef4f7e9ff6b4d86e602f81?s
 
 ## Development Steps
 
-1. Set up the Expo project using the Solana Mobile template.
+1. Set up the Expo project using the Solana Mobile template. Read more about it [here](https://docs.solanamobile.com/react-native/expo#running-the-app).
 
 ```
 yarn create expo-app --template @solana-mobile/solana-mobile-expo-template
 ```
 
-You can read more about it [here](https://docs.solanamobile.com/react-native/expo#running-the-app).
-
-3. Implement image capture:
+2. Implement image capture:
 
    - Use `expo-image-picker` to access the device camera.
    - Store the captured image locally.
 
-4. Implement geolocation:
+3. Implement geolocation:
 
    - Use `expo-location` to get the device's current location.
    - Store latitude and longitude coordinates.
 
-5. Set up Solana wallet connection:
+4. Set up Solana wallet connection:
 
    - Integrate @solana-mobile/mobile-wallet-adapter-protocol.
    - Implement wallet connection functionality.
 
-6. Implement image upload:
+5. Implement image upload:
 
    - Upload captured image to `Cloudinary`.
 
-7. Create NFT metadata:
+6. NFT metadata:
 
    - Prepare metadata including image URL and location data.
 
-8. Implement NFT minting:
+7. Implement NFT minting:
    - Use `@solana/web3.js` to connect to the Solana network.
    - Create and send mint transaction using `@solana/spl-token`.
 
